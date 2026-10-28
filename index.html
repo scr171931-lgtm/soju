@@ -1,39 +1,165 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#243f35">
-  <meta name="apple-mobile-web-app-title" content="Orbit Transit">
-  <title>Orbit Transit · Journey Lab</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>One Way Ticket</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="color.css">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#1d86d7">
+    <meta name="theme-color" content="#1d86d7" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="NJ Transit">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 </head>
+
 <body>
-  <main>
-    <header><span class="brand">◎ ORBIT TRANSIT</span><span class="badge">FICTIONAL APP</span></header>
-    <h1>Your next little journey.</h1>
-    <p class="intro">Explore a sample ride in the Orbit journey lab.</p>
-    <section class="journey" aria-label="Sample journey settings">
-      <div class="eyebrow">BUILD YOUR JOURNEY</div>
-      <div class="settings">
-        <label>Travel area<select id="travel-area"><option value="intra">Intrastate</option><option value="inter">Interstate</option></select></label>
-        <label>Zones<select id="zones"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></label>
-      </div>
-      <p id="summary">1 zone · Intrastate · 1 adult</p>
-      <div class="timer-row"><div><span class="eyebrow">SAMPLE SESSION</span><div id="countdown" role="timer">30:00</div></div><button id="restart" type="button">Restart timer ↗</button></div>
-      <progress id="remaining" max="1800" value="1800" aria-label="Sample session time remaining"></progress>
-    </section>
-    <section class="code-card" aria-label="Sample QR code">
-      <button class="qr-button" id="enlarge" type="button" aria-label="Enlarge sample QR code" aria-haspopup="dialog"><img src="sample-qr.svg" width="160" height="160" alt="QR code containing fictional Orbit sample text"></button>
-      <div><span class="eyebrow">A LITTLE CLOSER</span><h2>Your sample code</h2><p>Tap the QR to enlarge it.</p><span class="badge">SAMPLE · NO FARE VALUE</span></div>
-    </section>
-    <footer>Orbit is a fictional transit concept. This sample is not a travel ticket.</footer>
-  </main>
-  <dialog id="qr-dialog" aria-labelledby="qr-title">
-    <div class="dialog-heading"><h2 id="qr-title">Orbit sample QR</h2><button id="close-qr" type="button" aria-label="Close enlarged QR code">✕</button></div>
-    <img src="sample-qr.svg" width="400" height="400" alt="Enlarged fictional Orbit sample QR code">
-    <p>SAMPLE · NO FARE VALUE</p>
-  </dialog>
+
+    <!-- Blue header background -->
+    <div class="curved-background" id="curved-background"></div>
+
+    <!-- Title -->
+    <div class="header">One Way Ticket</div>
+
+    <!-- Card -->
+    <div class="card">
+
+        <!-- Top content -->
+        <div class="card-top">
+            <div class="qr">
+                <img class="qr-code" src="your-qr-code-image.png" id="QRCODE" alt="QR Code">
+            </div>
+            <div class="tap">Tap to enlarge</div>
+            <hr class="divider">
+            <div class="interstate" onclick="updateStateText()">INTERSTATE</div>
+            <div class="details-row">
+                <div class="month" id="pass_month_year">NOV<br>2025</div>
+                <div class="zone">
+                    <div class="number" onclick="updateZoneText()">2</div>
+                    <div class="text">ZONE RIDE</div>
+                    <div class="adult" onclick="updateAdultText()">1 Adult</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress bottom -->
+        <div class="progress">
+            <div class="color-strip">
+                <div class="color-block red"></div>
+                <div class="color-block green"></div>
+                <div class="color-block blue"></div>
+            </div>
+            <div class="progress-bar" id="progress-bar"></div>
+            <!-- <div class="expiry">Expires in <span id="countdown">60:00</span></div> -->
+            <div class="expiry"><span class="expires-text">Expires in </span><span id="countdown">60:00</span></div>
+            <div class="validator">View Onboard Validator Instructions</div>
+        </div>
+
+    </div>
+
+    <!-- <script>
+        function updateMonthAndYear() {
+            var currentDate = new Date();
+            var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            var month = monthNames[currentDate.getMonth()];
+            var year = currentDate.getFullYear();
+            document.getElementById("pass_month_year").innerHTML = month + "<br>" + year;
+        }
+
+        function updateZoneText() {
+            const zoneElement = document.querySelector('.number');
+            let currentZone = parseInt(zoneElement.textContent, 10);
+            currentZone = currentZone === 9 ? 2 : currentZone + 1;
+            zoneElement.textContent = currentZone;
+        }
+
+        function updateCountdown() {
+            const countdown = document.getElementById('countdown');
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const deadlineDate = new Date(currentDate.getFullYear(), currentMonth + 1, 1);
+            const timeRemaining = deadlineDate - currentDate;
+            const remainingDays = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const totalDaysInMonth = new Date(currentDate.getFullYear(), currentMonth + 1, 0).getDate();
+            const daysPassed = currentDate.getDate();
+            const progressPercentage = (daysPassed / totalDaysInMonth) * 100;
+            countdown.textContent = remainingDays.toString();
+            document.querySelector('.progress-bar').style.setProperty('--progress-width', `${100 - progressPercentage}%`);
+        }
+
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", "#1d86d7");
+        updateMonthAndYear();
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script> -->
+
+    <script>
+        function updateMonthAndYear() {
+            var currentDate = new Date();
+            var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            var month = monthNames[currentDate.getMonth()];
+            var year = currentDate.getFullYear();
+            document.getElementById("pass_month_year").innerHTML = month + "<br>" + year;
+        }
+
+        function updateZoneText() {
+            const zoneElement = document.querySelector('.number');
+            let currentZone = parseInt(zoneElement.textContent, 10);
+            currentZone = currentZone === 9 ? 2 : currentZone + 1;
+            zoneElement.textContent = currentZone;
+        }
+
+        const duration = 60 * 60 * 1000;
+
+        localStorage.setItem('ticketStart', Date.now().toString());
+        const startTime = parseInt(localStorage.getItem('ticketStart'));
+
+        function updateCountdown() {
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(duration - elapsed, 0);
+
+            if (remaining === 0) {
+                document.getElementById('countdown').textContent = 'EXPIRED';
+                document.querySelector('.expiry').style.color = 'red';
+                document.querySelector('.progress-bar').style.setProperty('--progress-width', '0%');
+                return;
+            }
+
+            const totalMinutes = Math.floor(remaining / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            const mm = String(totalMinutes).padStart(2, '0');
+            const ss = String(seconds).padStart(2, '0');
+
+            document.getElementById('countdown').textContent = `${mm}:${ss}`;
+
+            const progressPercent = ((duration - remaining) / duration) * 100 + 1;
+            document.querySelector('.progress-bar').style.setProperty('--progress-width', `${progressPercent}%`);
+        }
+        function updateAdultText() {
+            const adultElement = document.querySelector('.adult');
+            // Extract current number from text like "1 Adult" or "3 Adults"
+            let current = parseInt(adultElement.textContent, 10);
+            // Cycle 1 → 2 → 3 → 4 → 5 → 1
+            current = current === 5 ? 1 : current + 1;
+            // Use singular "Adult" for 1, plural "Adults" otherwise
+            adultElement.textContent = `${current} ${current === 1 ? 'Adult' : 'Adults'}`;
+        }
+        function updateStateText() {
+            const el = document.querySelector('.interstate');
+            const isInterstate = el.dataset.mode !== 'intra';
+            el.dataset.mode = isInterstate ? 'intra' : 'inter';
+            el.textContent = isInterstate ? 'INTRASTATE' : 'INTERSTATE';
+            el.classList.toggle('intrastate', isInterstate);
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        updateMonthAndYear();
+    </script>
+
 </body>
+
 </html>
