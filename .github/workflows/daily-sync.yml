@@ -1,0 +1,51 @@
+name: Daily sync and publish
+
+on:
+  schedule:
+    - cron: "23 8 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sync-and-publish
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.repository == 'scr171931-lgtm/soju'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Merge updates from original repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST \
+            repos/scr171931-lgtm/soju/merge-upstream \
+            -f branch=main
+
+      - name: Download updated website
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+
+      - name: Publish website
+        id: deployment
+        uses: actions/deploy-pages@v4
