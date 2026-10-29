@@ -38,7 +38,7 @@
             <div class="details-row">
                 <div class="month" id="pass_month_year">NOV<br>2025</div>
                 <div class="zone">
-                    <div class="number" onclick="updateZoneText()">2</div>
+                    <div class="number" onclick="updateZoneText()">1</div>
                     <div class="text">ZONE RIDE</div>
                     <div class="adult" onclick="updateAdultText()">1 Adult</div>
                 </div>
@@ -53,8 +53,8 @@
                 <div class="color-block blue"></div>
             </div>
             <div class="progress-bar" id="progress-bar"></div>
-            <!-- <div class="expiry">Expires in <span id="countdown">60:00</span></div> -->
-            <div class="expiry"><span class="expires-text">Expires in </span><span id="countdown">60:00</span></div>
+            <!-- <div class="expiry">Expires in <span id="countdown">30:00</span></div> -->
+            <div class="expiry"><span class="expires-text">Expires in </span><span id="countdown">30:00</span></div>
             <div class="validator">View Onboard Validator Instructions</div>
         </div>
 
@@ -72,7 +72,7 @@
         function updateZoneText() {
             const zoneElement = document.querySelector('.number');
             let currentZone = parseInt(zoneElement.textContent, 10);
-            currentZone = currentZone === 9 ? 2 : currentZone + 1;
+            currentZone = currentZone === 9 ? 1 : currentZone + 1;
             zoneElement.textContent = currentZone;
         }
 
@@ -108,16 +108,21 @@
         function updateZoneText() {
             const zoneElement = document.querySelector('.number');
             let currentZone = parseInt(zoneElement.textContent, 10);
-            currentZone = currentZone === 9 ? 2 : currentZone + 1;
+            currentZone = currentZone === 9 ? 1 : currentZone + 1;
             zoneElement.textContent = currentZone;
+            updateCountdown();
         }
 
-        const duration = 60 * 60 * 1000;
+        function getDuration() {
+            const zone = parseInt(document.querySelector('.number').textContent, 10);
+            return (zone === 1 ? 30 : 60) * 60 * 1000;
+        }
 
         localStorage.setItem('ticketStart', Date.now().toString());
         const startTime = parseInt(localStorage.getItem('ticketStart'));
 
         function updateCountdown() {
+            const duration = getDuration();
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(duration - elapsed, 0);
 
@@ -128,8 +133,10 @@
                 return;
             }
 
-            const totalMinutes = Math.floor(remaining / (1000 * 60));
-            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            document.querySelector('.expiry').style.color = '';
+            const totalSeconds = Math.ceil(remaining / 1000);
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
             const mm = String(totalMinutes).padStart(2, '0');
             const ss = String(seconds).padStart(2, '0');
 
