@@ -2,7 +2,7 @@ name: Morning sync and publish
 
 on:
   schedule:
-    - cron: "0,30 0-11 * * *"
+    - cron: "7,37 0-11 * * *"
       timezone: America/New_York
     - cron: "0 12 * * *"
       timezone: America/New_York
