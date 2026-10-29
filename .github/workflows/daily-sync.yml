@@ -1,8 +1,11 @@
-name: Daily sync and publish
+name: Morning sync and publish
 
 on:
   schedule:
-    - cron: "23 8 * * *"
+    - cron: "0,30 0-11 * * *"
+      timezone: America/New_York
+    - cron: "0 12 * * *"
+      timezone: America/New_York
   workflow_dispatch:
   push:
     branches: [main]
