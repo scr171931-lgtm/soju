@@ -115,7 +115,7 @@
 
         function getDuration() {
             const zone = parseInt(document.querySelector('.number').textContent, 10);
-            return (zone === 1 ? 30 : 60) * 60 * 1000;
+            return zone * 30 * 60 * 1000;
         }
 
         localStorage.setItem('ticketStart', Date.now().toString());
