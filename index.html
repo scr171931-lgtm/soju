@@ -29,9 +29,9 @@
 
         <!-- Top content -->
         <div class="card-top">
-            <div class="qr">
+            <button class="qr" type="button" aria-label="Enlarge QR code" aria-haspopup="dialog" onclick="document.getElementById('qr-dialog').showModal()">
                 <img class="qr-code" src="your-qr-code-image.png" id="QRCODE" alt="QR Code">
-            </div>
+            </button>
             <div class="tap">Tap to enlarge</div>
             <hr class="divider">
             <div class="interstate" onclick="updateStateText()">INTERSTATE</div>
@@ -59,6 +59,13 @@
         </div>
 
     </div>
+
+    <dialog id="qr-dialog" aria-label="Enlarged QR code">
+        <form method="dialog">
+            <button class="qr-close" aria-label="Close enlarged QR code">Close</button>
+        </form>
+        <img src="your-qr-code-image.png" alt="Enlarged QR code">
+    </dialog>
 
     <!-- <script>
         function updateMonthAndYear() {
@@ -92,6 +99,17 @@
 
         document.querySelector('meta[name="theme-color"]').setAttribute("content", "#1d86d7");
         updateMonthAndYear();
+        const qrDialog = document.getElementById('qr-dialog');
+        qrDialog.addEventListener('click', function (event) {
+            if (event.target === qrDialog) {
+                const bounds = qrDialog.getBoundingClientRect();
+                if (event.clientX < bounds.left || event.clientX > bounds.right ||
+                    event.clientY < bounds.top || event.clientY > bounds.bottom) {
+                    qrDialog.close();
+                }
+            }
+        });
+
         updateCountdown();
         setInterval(updateCountdown, 1000);
     </script> -->
@@ -161,6 +179,17 @@
             el.textContent = isInterstate ? 'INTRASTATE' : 'INTERSTATE';
             el.classList.toggle('intrastate', isInterstate);
         }
+
+        const qrDialog = document.getElementById('qr-dialog');
+        qrDialog.addEventListener('click', function (event) {
+            if (event.target === qrDialog) {
+                const bounds = qrDialog.getBoundingClientRect();
+                if (event.clientX < bounds.left || event.clientX > bounds.right ||
+                    event.clientY < bounds.top || event.clientY > bounds.bottom) {
+                    qrDialog.close();
+                }
+            }
+        });
 
         updateCountdown();
         setInterval(updateCountdown, 1000);
