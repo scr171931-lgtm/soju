@@ -25,11 +25,20 @@ jobs:
     steps:
       - name: Check out fork
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Mirror upstream and check out the mirrored commit
         run: |
           git fetch --no-tags https://github.com/tp898508/soju.git refs/heads/main
           git push origin +FETCH_HEAD:refs/heads/upstream-main
           git checkout --detach FETCH_HEAD
+      - name: Apply the two zone countdown commits
+        run: |
+          git -c user.name=github-actions[bot] \
+              -c user.email=41898282+github-actions[bot]@users.noreply.github.com \
+              cherry-pick --empty=drop \
+              1e5acf865e39db1d391f30f9ed7851ee69ced290 \
+              fe167cb20028d834b1ce984ab79763cc78befc58
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website
