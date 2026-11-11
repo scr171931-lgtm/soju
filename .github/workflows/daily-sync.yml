@@ -25,20 +25,35 @@ jobs:
     steps:
       - name: Check out fork
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - name: Mirror upstream and check out the mirrored commit
         run: |
           git fetch --no-tags https://github.com/tp898508/soju.git refs/heads/main
           git push origin +FETCH_HEAD:refs/heads/upstream-main
           git checkout --detach FETCH_HEAD
-      - name: Apply the two zone countdown commits
+      - name: Apply the one-zone option and 30 minutes per zone
         run: |
-          git -c user.name=github-actions[bot] \
-              -c user.email=41898282+github-actions[bot]@users.noreply.github.com \
-              cherry-pick --empty=drop \
-              1e5acf865e39db1d391f30f9ed7851ee69ced290 \
-              fe167cb20028d834b1ce984ab79763cc78befc58
+          python3 - <<'PY'
+          from pathlib import Path
+
+          page = Path('index.html')
+          html = page.read_text(encoding='utf-8')
+
+          # Reapply the behavior from 1e5acf8 and fe167cb to the upstream page.
+          edits = {
+              'onclick="updateZoneText()">2</div>': 'onclick="updateZoneText()">1</div>',
+              'id="countdown">60:00</span>': 'id="countdown">30:00</span>',
+              'currentZone === 9 ? 2 :': 'currentZone === 9 ? 1 :',
+              'zoneElement.textContent = currentZone;': 'zoneElement.textContent = currentZone;\n            updateCountdown();',
+              '        const duration = 60 * 60 * 1000;\n\n': '',
+              'function updateCountdown() {': "function updateCountdown() {\n            const zone = parseInt(document.querySelector('.number').textContent, 10);\n            const duration = zone * 30 * 60 * 1000;",
+              'const totalMinutes = Math.floor(remaining / (1000 * 60));\n            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);': "document.querySelector('.expiry').style.color = '';\n            const totalSeconds = Math.ceil(remaining / 1000);\n            const totalMinutes = Math.floor(totalSeconds / 60);\n            const seconds = totalSeconds % 60;",
+          }
+          for original, replacement in edits.items():
+              if original not in html:
+                  raise SystemExit(f'Upstream countdown code changed near {original!r}')
+              html = html.replace(original, replacement)
+          page.write_text(html, encoding='utf-8')
+          PY
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website
